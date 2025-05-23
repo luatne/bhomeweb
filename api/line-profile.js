@@ -1,16 +1,10 @@
-import express from 'express'
 import axios from 'axios'
-import dotenv from 'dotenv'
-import cors from 'cors' // ✅ Thêm dòng này
 
-dotenv.config()
+export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Chỉ hỗ trợ phương thức GET' })
+  }
 
-const app = express()
-const port = process.env.PORT || 3000
-
-app.use(cors()) // ✅ Cho phép mọi origin (có thể cấu hình cụ thể hơn nếu cần)
-
-app.get('/api/line-profile', async (req, res) => {
   const userId = req.query.userId
 
   if (!userId) {
@@ -26,7 +20,8 @@ app.get('/api/line-profile', async (req, res) => {
 
     const { displayName, pictureUrl } = response.data
 
-    res.json({
+    res.setHeader('Access-Control-Allow-Origin', '*') // ✅ CORS cho phép tất cả
+    res.status(200).json({
       userId,
       displayName,
       pictureUrl
@@ -35,8 +30,4 @@ app.get('/api/line-profile', async (req, res) => {
     console.error('Lỗi gọi LINE API:', err.response?.data || err.message)
     res.status(500).json({ error: 'Không thể lấy thông tin người dùng từ LINE' })
   }
-})
-
-app.listen(port, () => {
-  console.log(`API đang chạy tại http://localhost:${port}`)
-})
+}
