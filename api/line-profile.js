@@ -1,11 +1,14 @@
 import express from 'express'
 import axios from 'axios'
 import dotenv from 'dotenv'
+import cors from 'cors' // ✅ Thêm dòng này
 
 dotenv.config()
 
 const app = express()
 const port = process.env.PORT || 3000
+
+app.use(cors()) // ✅ Cho phép mọi origin (có thể cấu hình cụ thể hơn nếu cần)
 
 app.get('/api/line-profile', async (req, res) => {
   const userId = req.query.userId
