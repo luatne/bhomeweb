@@ -65,7 +65,18 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxeHpkYnBlcHlvZmloYml4amF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxMjM0NjksImV4cCI6MjA2MjY5OTQ2OX0.5bLHn051lX7OAHn6glvOZxIfyEyA2FErU8KXUXkybbk'
 
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  let disabledSessions = JSON.parse(localStorage.getItem('disabledSessions') || '[]')
+let disabledSessions = []
+
+async function fetchDisabledSessionsFromWebhook() {
+  try {
+    const res = await fetch('https://vpsn8n.thuhoai-academy.com/webhook/laydanhsach')
+    const data = await res.json()
+    disabledSessions = data.disabledSessions || []
+  } catch (err) {
+    console.error('Lỗi khi fetch từ webhook:', err)
+    disabledSessions = []
+  }
+}
 
   async function fetchSessionsFromSupabase() {
     const { data, error } = await supabaseClient
@@ -134,7 +145,7 @@
       // Nếu muốn lưu localStorage, mở dòng dưới ra
       // localStorage.setItem('disabledSessions', JSON.stringify(disabledSessions))
 
-      await init()
+      await init1()
     } catch (error) {
       alert('Lỗi kết nối server')
       console.error(error)
@@ -142,8 +153,15 @@
   }
 
   async function init() {
+    await fetchDisabledSessionsFromWebhook()
     const sessions = await fetchSessionsFromSupabase()
     await renderSessions(sessions)
+    
+  }
+    async function init1() {
+    const sessions = await fetchSessionsFromSupabase()
+    await renderSessions(sessions)
+    
   }
 
   init()
